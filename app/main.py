@@ -14,11 +14,13 @@ feePayer (gasless côté buyer). La borne DURE des 500 caractères de descriptio
 (contrainte /verify du facilitator CDP) s'applique aussi ici — guard fail-fast.
 """
 
+import contextlib
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException
+from starlette.routing import Mount
 
 from x402 import x402ResourceServer
 from x402.extensions.bazaar import (
@@ -60,8 +62,38 @@ from app.routers import (
     visibility_audit,
 )
 
+# --- Serveur MCP distant monté sur /mcp (remote MCP, mode découverte) ---
+# Expose les 10 endpoints comme outils MCP natifs. Sans clé acheteur côté serveur,
+# le serveur MCP renvoie les conditions de paiement x402. Tout échec d'init MCP est
+# isolé : il NE doit PAS casser l'API de paiement.
+_mcp_session_manager = None
+try:
+    from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+
+    from mcp_server.server import build_server as _build_mcp_server
+
+    _mcp_session_manager = StreamableHTTPSessionManager(
+        app=_build_mcp_server(), json_response=True, stateless=True
+    )
+except Exception as _mcp_exc:  # pragma: no cover — MCP optionnel, jamais bloquant
+    import sys as _sys
+
+    print(f"[x402] MCP mount disabled: {type(_mcp_exc).__name__}: {_mcp_exc}", file=_sys.stderr)
+
+
+@contextlib.asynccontextmanager
+async def _lifespan(_app: "FastAPI"):
+    """Démarre le gestionnaire de sessions MCP (si dispo) pour la durée de vie de l'app."""
+    if _mcp_session_manager is not None:
+        async with _mcp_session_manager.run():
+            yield
+    else:
+        yield
+
+
 app = FastAPI(
     title="x402-solana",
+    lifespan=_lifespan,
     description=(
         "Paid x402 API tools for AI agents, settled in USDC on Solana. Crypto pre-trade safety "
         "(Solana SPL rug/honeypot checks, EVM+Solana token safety, one-call GO/NO-GO pre-trade "
@@ -518,3 +550,14 @@ async def wellknown_agent_card() -> FileResponse:
 @app.get("/llms.txt", include_in_schema=False)
 async def llms_txt() -> FileResponse:
     return _serve_file("llms.txt", "text/plain; charset=utf-8")
+
+
+# --- Endpoint MCP distant (route ASGI brute, hors paywall x402) ---
+# Les agents MCP HTTP (ex. connectors Claude.ai) s'y connectent pour découvrir et
+# appeler les 10 endpoints comme outils. Non listé dans _routes -> non gated.
+if _mcp_session_manager is not None:
+
+    async def _handle_mcp(scope, receive, send):
+        await _mcp_session_manager.handle_request(scope, receive, send)
+
+    app.router.routes.append(Mount("/mcp", app=_handle_mcp))
