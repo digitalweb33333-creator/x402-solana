@@ -43,19 +43,19 @@ def main():
         found=set()
         print("=== /discovery/search (Solana hits only) ===")
         for q in QUERIES:
-            r=cl.get(f"{FAC}/discovery/search", params={"query":q,"limit":50,"offset":0},
+            r=cl.get(f"{FAC}/discovery/search", params={"query":q,"limit":20,"offset":0},
                      headers={"Authorization":f"Bearer {jwt('/discovery/search')}"})
             items=(r.json().get("resources") if r.status_code==200 else []) or []
             mine=_mine(items); found.update(mine)
             print(f"  [{q:24}] http={r.status_code} total={len(items)} solana-mine={len(mine)}")
         print("=== /discovery/resources full scan ===")
-        for off in range(0,400,50):
-            r=cl.get(f"{FAC}/discovery/resources", params={"limit":50,"offset":off},
+        for off in range(0,600,20):
+            r=cl.get(f"{FAC}/discovery/resources", params={"limit":20,"offset":off},
                      headers={"Authorization":f"Bearer {jwt('/discovery/resources')}"})
-            if r.status_code!=200: print(f"  offset={off} http={r.status_code}"); break
+            if r.status_code!=200: print(f"  offset={off} http={r.status_code} {r.text[:120]}"); break
             items=r.json().get("items") or r.json().get("resources") or []
             found.update(_mine(items))
-            if len(items)<50: break
+            if len(items)<20: break
         print(f"\n=== indexé (Solana, notre seller/domaine): {len(found)} ===")
         for u in sorted(found): print("   -", u)
         if not found: print("   (0 → en attente d'indexation ; crawl périodique du Bazaar)")

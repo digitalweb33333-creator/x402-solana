@@ -29,7 +29,7 @@ const MODEL_TEXT_SMALL = "TEXT_SMALL";
 function actionDescription(ep: CatalogEndpoint): string {
   const parts = [
     ep.description.trim(),
-    `Price: ${ep.price} per call (x402 payment, USDC on Base mainnet).`,
+    `Price: ${ep.price} per call (x402 payment, USDC on Solana mainnet).`,
   ];
   if (ep.llm_usage_prompt) parts.push(ep.llm_usage_prompt.trim());
   return parts.filter(Boolean).join(" ");

@@ -25,15 +25,14 @@ export const x402CatalogProvider: Provider = {
     _state: State,
   ): Promise<ProviderResult> => {
     const cfg = resolveConfig((k) => runtime.getSetting?.(k));
-    const mode = cfg.autoPay
-      ? "auto-pay (a funded buyer wallet is configured; calls return live data)"
-      : "discovery (no buyer wallet; calls return payment terms until X402_BUYER_PRIVATE_KEY is set)";
+    const mode =
+      "discovery (calls return x402 payment terms; pay them with any x402-aware Solana client to get live data)";
     const lines = endpoints.map(
       (e) => `- ${e.action} (${e.price}): ${firstSentence(e.description)}`,
     );
     const text =
       `# x402 paid tools available (${endpoints.length})\n` +
-      `Billed per call via the x402 protocol (USDC on Base mainnet). Mode: ${mode}.\n` +
+      `Billed per call via the x402 protocol (USDC on Solana mainnet). Mode: ${mode}.\n` +
       lines.join("\n");
     return {
       text,

@@ -103,9 +103,9 @@ function toPaymentTerms(ep: CatalogEndpoint, decoded: any, cfg: ClientConfig): P
     scheme: a.scheme || "exact",
     maxTimeoutSeconds: a.maxTimeoutSeconds || a.max_timeout_seconds || 300,
     howToPay:
-      "This endpoint requires an x402 micropayment (USDC on Base mainnet). Configure " +
-      "X402_BUYER_PRIVATE_KEY (a funded Base wallet) on this agent to auto-pay and receive " +
-      "live data, or complete the payment with any x402-aware HTTP client.",
+      "This endpoint requires an x402 micropayment (USDC on Solana mainnet). Complete " +
+      "the payment with any x402-aware Solana client to receive live data. Solana auto-pay " +
+      "is not wired in this build (discovery mode).",
     exampleOutput: ep.outputExample,
   };
 }

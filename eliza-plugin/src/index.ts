@@ -1,12 +1,14 @@
 /**
- * @x402-endpoints/plugin-elizaos
+ * plugin-x402-solana
  *
- * ElizaOS plugin exposing the x402-endpoints catalogue (28 paid data endpoints:
- * official EU/global registries + crypto pre-trade data) as native Eliza actions,
- * billed per call via the x402 protocol (USDC on Base mainnet).
+ * ElizaOS plugin exposing the x402-solana catalogue (10 paid endpoints:
+ * crypto/Solana pre-trade safety, market data, KYB/AML verification and x402
+ * discoverability) as native Eliza actions, billed per call via the x402 protocol
+ * (USDC on Solana mainnet).
  *
- * Configure X402_BUYER_PRIVATE_KEY (a funded Base wallet) to auto-pay and receive
- * live data; otherwise actions return the exact payment terms (discovery).
+ * Discovery mode by default (actions return the exact x402 payment terms). Solana
+ * auto-pay is not wired in this build; pay the returned terms with any x402-aware
+ * Solana client.
  */
 
 import type { Plugin } from "@elizaos/core";
@@ -16,14 +18,14 @@ import { x402CatalogProvider } from "./provider.js";
 import { catalog, endpoints, ENDPOINT_COUNT } from "./catalog.js";
 
 export const x402Plugin: Plugin = {
-  name: "x402-endpoints",
+  name: "x402-solana",
   description:
-    `Exposes the ${ENDPOINT_COUNT} paid x402-endpoints data tools (official EU/global ` +
-    `registries: GLEIF, VIES, BODACC, EUR-Lex, Companies House, EPO, sanctions, CVE, FDA… ` +
-    `+ crypto pre-trade data: token-safety, derivatives-radar, wallet-xray, dex-cex-spread) ` +
-    `as native ElizaOS actions, billed per call via x402 (USDC on Base mainnet). ` +
-    `Set X402_BUYER_PRIVATE_KEY to auto-pay and receive live data; otherwise actions ` +
-    `return exact payment terms for discovery.`,
+    `Exposes the ${ENDPOINT_COUNT} paid x402-solana data tools (crypto & Solana ` +
+    `pre-trade safety: token-safety, pre-trade verdict, token dossier; market data: ` +
+    `Polymarket odds; KYB/AML: GLEIF LEI, sanctions screening; x402 discoverability: ` +
+    `agent rank & visibility audit) as native ElizaOS actions, billed per call via ` +
+    `x402 (USDC on Solana mainnet). Actions return exact payment terms for discovery; ` +
+    `pay them with any x402-aware Solana client to receive live data.`,
   actions: buildActions(),
   providers: [x402CatalogProvider],
 };

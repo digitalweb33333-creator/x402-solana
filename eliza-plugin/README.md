@@ -1,33 +1,32 @@
-# plugin-x402-endpoints — ElizaOS plugin
+# plugin-x402-solana — ElizaOS plugin
 
-Exposes the **28 paid endpoints** of the [x402-endpoints](https://x402-endpoints.onrender.com)
+Exposes the **10 paid endpoints** of the [x402-solana](https://x402-solana-cva8.onrender.com)
 catalogue as **native ElizaOS actions**. An Eliza agent can discover and call them in
-natural language; each call is billed per use via the **x402 protocol** (USDC on **Base mainnet**).
+natural language; each call is billed per use via the **x402 protocol** (USDC on **Solana mainnet**,
+settled through the Coinbase CDP facilitator — gasless for the buyer).
 
 The catalogue covers:
-- **Official EU / global registries** — GLEIF (LEI), VIES (EU VAT), Companies House (UK),
-  INSEE Sirene (FR), BODACC, EUR-Lex, Légifrance, EPO patents, TED tenders, sanctions
-  screening, CVE, FDA recalls / drug labels, IBAN, ECB FX…
-- **Crypto pre-trade data** — token-safety, derivatives-radar, wallet-xray, dex-cex-spread,
-  new-pairs, plus Polymarket odds and web search/extract.
+- **Crypto & Solana pre-trade safety** — SPL/EVM token-safety (rug & honeypot checks),
+  GO/NO-GO pre-trade verdicts, full token dossiers.
+- **Market data** — Polymarket odds.
+- **Official KYB / AML verification** — GLEIF (LEI) lookup, EU sanctions screening.
+- **x402 discoverability** — agent rank check and visibility audit.
 
 The actions are generated from `src/catalog.json`, which is bundled at build time, so the
-plugin never diverges from the catalogue it was built from.
+plugin never diverges from the live catalogue it was built from.
 
-## Two modes
+## Mode
 
-| Mode | When | An action call does |
-|---|---|---|
-| **Auto-pay** | a funded Base buyer key is configured | pays the x402 micropayment and returns **live data** |
-| **Discovery** (default) | no key | returns the exact **payment terms** (price, network, asset, `payTo`, resource) + an example output |
+**Discovery (default).** An action call returns the exact x402 **payment terms** (price,
+network, asset, `payTo`, resource) plus an example output. Pay the returned terms with any
+x402-aware **Solana** client to receive live data.
 
-> ⚠️ Never put a buyer key on a shared/hosted agent. Auto-pay is for an agent that runs
-> with its own wallet.
+> Solana auto-pay is not wired in this build — leave `X402_AUTO_PAY` at `0`.
 
 ## Install
 
 ```bash
-npm install plugin-x402-endpoints
+npm install plugin-x402-solana
 # peer dependency:
 npm install @elizaos/core
 ```
@@ -36,16 +35,16 @@ npm install @elizaos/core
 
 ```ts
 import { AgentRuntime } from "@elizaos/core";
-import x402Plugin from "plugin-x402-endpoints";
+import x402Plugin from "plugin-x402-solana";
 
 const runtime = new AgentRuntime({
   character: {
     name: "MyAgent",
-    plugins: ["plugin-x402-endpoints"],
+    plugins: ["plugin-x402-solana"],
     settings: {
       secrets: {
-        // optional — enables auto-pay (a Base wallet funded in USDC):
-        X402_BUYER_PRIVATE_KEY: process.env.X402_BUYER_PRIVATE_KEY,
+        // all optional — sensible Solana defaults are bundled:
+        // X402_BASE_URL: "https://x402-solana-cva8.onrender.com",
       },
     },
   },
@@ -53,13 +52,15 @@ const runtime = new AgentRuntime({
 });
 ```
 
-The agent now has 28 actions (`X402_GLEIF_LEI`, `X402_VIES_VAT`, `X402_CRYPTO_TOKEN_SAFETY`,
-`X402_CRYPTO_DERIVATIVES_RADAR`, `X402_CRYPTO_WALLET_XRAY`, …) and an `X402_CATALOG`
-provider that lists every paid tool in context. Example prompts:
+The agent now has 10 actions (`X402_GLEIF_LEI`, `X402_SANCTIONS_SCREEN`,
+`X402_POLYMARKET_ODDS`, `X402_CRYPTO_TOKEN_SAFETY`, `X402_CRYPTO_PRE_TRADE_VERDICT`,
+`X402_CRYPTO_TOKEN_DOSSIER`, `X402_SOLANA_TOKEN_SAFETY`, `X402_SOLANA_PRE_TRADE`,
+`X402_AGENT_RANK_CHECK`, `X402_AGENT_VISIBILITY_AUDIT`) and an `X402_CATALOG` provider
+that lists every paid tool in context. Example prompts:
 
 - *"Look up LEI 529900T8BM49AURSDO55"* → `X402_GLEIF_LEI`
-- *"Is token 0x… on Base a honeypot?"* → `X402_CRYPTO_TOKEN_SAFETY`
-- *"Validate IE VAT 6388047V"* → `X402_VIES_VAT`
+- *"Is this SPL token a honeypot?"* → `X402_SOLANA_TOKEN_SAFETY`
+- *"Should I buy this token — GO or NO-GO?"* → `X402_SOLANA_PRE_TRADE`
 
 Parameters are taken from explicit action options, structured message content, or extracted
 from the natural-language message via the runtime model.
@@ -68,10 +69,9 @@ from the natural-language message via the runtime model.
 
 | Setting | Default | Role |
 |---|---|---|
-| `X402_BUYER_PRIVATE_KEY` | — | Private key of a **Base wallet funded in USDC**; enables auto-pay. `EVM_PRIVATE_KEY` / `WALLET_PRIVATE_KEY` are also accepted. |
-| `X402_AUTO_PAY` | `1` | Set to `0`/`false` to force discovery mode even with a key. |
-| `X402_BASE_URL` | `https://x402-endpoints.onrender.com` | API base URL. |
-| `X402_NETWORK` | `eip155:8453` | Payment network (Base mainnet). |
+| `X402_BASE_URL` | `https://x402-solana-cva8.onrender.com` | API base URL. |
+| `X402_NETWORK` | `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp` | Payment network (Solana mainnet). |
+| `X402_AUTO_PAY` | `0` | Discovery mode. Solana auto-pay is not wired in this build; leave at `0`. |
 
 ## Build & test
 

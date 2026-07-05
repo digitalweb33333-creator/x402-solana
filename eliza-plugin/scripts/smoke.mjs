@@ -68,7 +68,10 @@ async function main() {
   check("live call returned terms (discovery) or data (if funded)", res.success === true && gotTerms);
   if (data.x402PaymentRequired) {
     check("payment terms include price $0.01", data.price === "$0.01");
-    check("payment terms include payTo", typeof data.payTo === "string" && data.payTo.startsWith("0x"));
+    check(
+      "payment terms include Solana payTo",
+      data.payTo === "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+    );
   }
 
   console.log(`\n${failures === 0 ? "ALL CHECKS PASSED" : failures + " CHECK(S) FAILED"}`);
