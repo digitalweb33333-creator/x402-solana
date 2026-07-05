@@ -5,7 +5,7 @@
 - Payment rail: x402 exact, USDC on Solana mainnet (solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp).
 - Asset: USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v (6 decimals). Pay to: CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF.
 - Facilitator: https://api.cdp.coinbase.com/platform/v2/x402 (gasless for the buyer — the facilitator is fee payer).
-- Base URL: https://x402-solana.onrender.com. No API key — payment is authentication.
+- Base URL: https://x402-solana-cva8.onrender.com. No API key — payment is authentication.
 
 ## Endpoints
 

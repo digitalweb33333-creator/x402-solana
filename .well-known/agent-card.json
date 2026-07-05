@@ -2,11 +2,11 @@
   "protocolVersion": "0.3.0",
   "name": "x402-solana",
   "description": "Paid x402 API tools for AI agents, settled in USDC on Solana. Crypto pre-trade safety (Solana SPL rug/honeypot checks, EVM+Solana token safety, one-call GO/NO-GO pre-trade verdicts, full token dossiers), market data (Polymarket prediction-market odds), official verification (GLEIF LEI KYB, EU sanctions/AML screening), and x402 agent discoverability (Bazaar keyword-rank pulse and signed visibility audits). Real-time, structured, machine-readable verdicts. No API key — payment is authentication. Gasless for the buyer (the facilitator is fee payer).",
-  "url": "https://x402-solana.onrender.com",
+  "url": "https://x402-solana-cva8.onrender.com",
   "preferredTransport": "JSONRPC",
   "provider": {
     "organization": "x402-solana",
-    "url": "https://x402-solana.onrender.com"
+    "url": "https://x402-solana-cva8.onrender.com"
   },
   "version": "0.1.0",
   "capabilities": {

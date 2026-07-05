@@ -14,7 +14,7 @@ services:
     envVars:
       # --- Publics (rail de paiement Solana) ---
       - key: PUBLIC_BASE_URL
-        value: https://x402-solana.onrender.com
+        value: https://x402-solana-cva8.onrender.com
       - key: SOLANA_SELLER_ADDRESS
         value: CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF
       - key: SOLANA_USDC_MINT
