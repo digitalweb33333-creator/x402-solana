@@ -1,0 +1,84 @@
+{
+  "name": "plugin-x402-solana",
+  "version": "0.1.0",
+  "description": "ElizaOS plugin exposing the x402-solana catalogue (10 paid endpoints: crypto/Solana pre-trade safety, market data, KYB/AML verification, x402 discoverability) as native agent actions, billed per call via x402 (USDC on Solana mainnet).",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "smoke": "node scripts/smoke.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "elizaos",
+    "plugin",
+    "elizaos-plugin",
+    "elizaos-plugins",
+    "eliza",
+    "x402",
+    "agent",
+    "ai-agent",
+    "micropayments",
+    "solana",
+    "usdc",
+    "crypto",
+    "compliance"
+  ],
+  "author": "x402-solana",
+  "license": "MIT",
+  "homepage": "https://x402-solana-cva8.onrender.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/digitalweb33333-creator/x402-solana",
+    "directory": "eliza-plugin"
+  },
+  "peerDependencies": {
+    "@elizaos/core": ">=1.0.0"
+  },
+  "dependencies": {
+    "viem": "^2.21.0",
+    "x402-fetch": "^1.0.0"
+  },
+  "devDependencies": {
+    "@elizaos/core": "^1.7.2",
+    "@types/node": "^22.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  },
+  "agentConfig": {
+    "pluginType": "elizaos:plugin:1.0.0",
+    "pluginParameters": {
+      "X402_AUTO_PAY": {
+        "type": "string",
+        "required": false,
+        "default": "0",
+        "description": "Discovery mode by default (returns x402 payment terms). Solana auto-pay is not wired in this build; leave at 0."
+      },
+      "X402_BASE_URL": {
+        "type": "string",
+        "required": false,
+        "default": "https://x402-solana-cva8.onrender.com",
+        "description": "Base URL of the x402-solana API."
+      },
+      "X402_NETWORK": {
+        "type": "string",
+        "required": false,
+        "default": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+        "description": "Payment network (Solana mainnet)."
+      }
+    }
+  }
+}
