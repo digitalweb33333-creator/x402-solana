@@ -35,3 +35,25 @@ Les 2 endpoints agent-meta (`rank-check`, `visibility-audit`) ont d'abord renvoy
 (non chargés) car testés avec un seller placeholder `api.example.com` sans document de découverte.
 Corrigé en pointant un vrai seller x402 découvrable (`x402-endpoints.onrender.com`) → 200 + settle OK.
 Aucun bug de paiement ; les 8 autres avaient settlé du premier coup.
+
+## Série 2 — 2026-07-05 (paiements contre l'URL LIVE, pour l'indexation Bazaar)
+
+Payés directement sur `https://x402-solana-cva8.onrender.com` (et non le serveur local) afin
+que le facilitator CDP voie les **URLs live** et les indexe au Bazaar. 10/10 réussis, HTTP 200,
+gasless. → Résultat : les 10 endpoints Solana sont **découvrables via la recherche du CDP Bazaar**
+(vérifié avec `tools/verify_bazaar.py`).
+
+| # | Endpoint | Tx signature |
+|---|---|---|
+| 1 | /gleif/lei | `2GvrRm89KhnREuo6mXwm4z1Ah1F65Qgb9EHkuhNyzhnnzDXVAAggqCfBkQxSixQYiCFW6f9Ybu4eREgeMoeydiiw` |
+| 2 | /sanctions/screen | `5uD4zKzX33Kq8VeMsjoav5JhkZT4pGCcgZmz8ztBg2uAKyzyE7PLXjb3XRKLvzJDLVU5Hu7fntPRBB9UJ8ZYSH8N` |
+| 3 | /polymarket/odds | `45U1ax3KoJQdxotuMmNtm5AxnPDhaDNR2p6jR4KivJpj88zAnofUkM7jsxjMBJLLAprxPQtmEnNxePZouBVdUyfQ` |
+| 4 | /crypto/token-safety | `rzzhhJS67aqMUQXow5zp43VUSH6cnsWpC53am6JUaFcjNzzf5Dv7iNYG3W5o5EBAPFT7KDSUzRC88ZHwywwGLyn` |
+| 5 | /crypto/pre-trade-verdict | `49Hk58j2mpyUt3fGoSwdnhuCiTPgMqeJ8QK76HfxGo1r1zvuGZoURXoKqVjo2egaKL8AeLBU7Y57hH3kbn1KdBGw` |
+| 6 | /crypto/token-dossier | `3NCiC3A32eVM6DqZ1i4zvFP4WtU7PPpa9rd8umC5q1cGdJuhHP2x2oEvNdStUu7A1LN7gdnJ9MeuZTNczDeBm5s3` |
+| 7 | /solana/token-safety | `2FTFfmcgcX5ESXmMHTrkRqqm8pK6Wb8womtHreccT5HDancaVVUeVPgbGhZifyBKPEcw3F31pzwEnzwVUFJAo2aC` |
+| 8 | /solana/pre-trade | `HAN6QM9sGCVhZHbXMR97CnoJYswjivnMbyqwvpufcACefZn9F1RLYdcz419eD7htSTc3DvhKcxFsgiCiR9tL3vU` |
+| 9 | /agent/rank-check | `g41qZwiiwrzMMoKqxTwByrANz53LPXyyAzaEeTyksMde1qy1SUxCwNewARncGvxcMozuoXaDncohZciQ9oNxyXz` |
+| 10 | /agent/visibility-audit | `3hoEVw2CMa6TmsSptoJF4qykYBE3jNASiLktDUJe7wozepE77XBtxtfRBKyNs6BBLcHtZYrnTYkZD19CTdydEZKs` |
+
+**Cumul : 20/20 settlements réels on-chain.**
