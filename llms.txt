@@ -1,0 +1,70 @@
+# x402-solana
+
+> Paid x402 API tools for AI agents, settled in USDC on Solana. Crypto pre-trade safety (Solana SPL rug/honeypot checks, EVM+Solana token safety, one-call GO/NO-GO pre-trade verdicts, full token dossiers), market data (Polymarket prediction-market odds), official verification (GLEIF LEI KYB, EU sanctions/AML screening), and x402 agent discoverability (Bazaar keyword-rank pulse and signed visibility audits). Real-time, structured, machine-readable verdicts. No API key — payment is authentication. Gasless for the buyer (the facilitator is fee payer).
+
+- Payment rail: x402 exact, USDC on Solana mainnet (solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp).
+- Asset: USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v (6 decimals). Pay to: CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF.
+- Facilitator: https://api.cdp.coinbase.com/platform/v2/x402 (gasless for the buyer — the facilitator is fee payer).
+- Base URL: https://x402-solana.onrender.com. No API key — payment is authentication.
+
+## Endpoints
+
+### GET /gleif/lei  ($0.01)
+Look up any Legal Entity Identifier (LEI) for company information lookup and counterparty / know-your-business (KYB) identity against the official GLEIF global registry — returns legal name, status, jurisdiction, legal form and registered address, real-time, worldwide coverage.
+- Input (query): lei*
+- Example: GET /gleif/lei?lei=529900T8BM49AURSDO55
+- Tags: lei, gleif, kyb, company-data, compliance
+
+### GET /sanctions/screen  ($0.05)
+Screen a name against the official EU consolidated sanctions list (FISMA) for anti-money-laundering (AML) and watchlist checks — returns matches with a similarity score and context (EU reference, type, programme), not a binary yes/no.
+- Input (query): name*, type, threshold, limit
+- Example: GET /sanctions/screen?name=Saddam Hussein&type=person&threshold=0.7&limit=5
+- Tags: sanctions, aml, watchlist, compliance, eu
+
+### GET /polymarket/odds  ($0.05)
+Live prediction market odds, implied probabilities and betting-market data from Polymarket — give a market id or slug, get each outcome with its probability (0-1), volume, liquidity and resolution status.
+- Input (query): market*
+- Example: GET /polymarket/odds?market=2654605
+- Tags: polymarket, prediction-market, betting-odds, odds, probability
+
+### GET /crypto/token-safety  ($0.05)
+Token safety check before buying — is this token a honeypot or a rug pull? Bundles honeypot detection, buy/sell tax, holder concentration, LP lock and liquidity (GoPlus, Honeypot.is, DexScreener) into a single 0-100 token security risk score with a clear buy/avoid verdict. One call replaces three lookups. EVM chains.
+- Input (query): token*, chain
+- Example: GET /crypto/token-safety?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&chain=base
+- Tags: token-safety, honeypot, rug-check, token-security, risk-score
+
+### GET /crypto/pre-trade-verdict  ($0.05)
+One-call GO/CAUTION/NO-GO pre-trade verdict for AI trading agents: fuses token safety (honeypot, rug, tax, holders), counterparty wallet sanctions screening (OFAC/mixer) and cross-exchange market signal into a single decision with a signed, offline-verifiable receipt. Should I buy this token now? Replaces three separate calls (token-safety + wallet-screen + signal) with one fused GO/NO-GO verdict. EVM chains and Solana.
+- Input (query): token*, chain, wallet
+- Example: GET /crypto/pre-trade-verdict?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&chain=base
+- Tags: pre-trade-verdict, token-safety, go-no-go, counterparty-screen, trading-decision
+
+### GET /crypto/token-dossier  ($0.10)
+Full degen token dossier in one call: safety score + honeypot/tax + detailed TOP HOLDERS and concentration + liquidity/FDV/volume/pool-age + contract control (owner, creator, mintable, open-source) + an AI red-flag narrative. Deep due-diligence report on a token before aping — the premium tier above a plain safety check. EVM chains and Solana.
+- Input (query): token*, chain
+- Example: GET /crypto/token-dossier?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&chain=base
+- Tags: token-dossier, holders, liquidity, rug-check, red-flags
+
+### GET /solana/token-safety  ($0.01)
+Solana SPL token safety, rug check and honeypot / scam detection before trading: is this Solana token a rug pull, honeypot or scam? Verdict SAFE/RISKY/CRITICAL + 0-100 score combining STATIC checks (mint/freeze authority, holder concentration) AND BEHAVIORAL analysis (liquidity, churn, recent dump, tx velocity) plus a blue-chip false-positive guard so USDC/USDT/SOL are never flagged. Pre-trade SPL token security / scam-token detection catching behavioral rugs static checkers miss.
+- Input (query): mint*, deep
+- Example: GET /solana/token-safety?mint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&deep=False
+- Tags: solana-token-safety, rug-check, honeypot, behavioral-analysis, spl-token-risk
+
+### GET /solana/pre-trade  ($0.05)
+All-in-one Solana pre-trade decision in ONE call: BUY-SAFE/CAUTION/AVOID fusing four scored modules — token security, EXECUTABLE liquidity depth (estimated slippage at $100/$1k/$10k), deployer history/control and holder concentration. Should I buy or avoid this Solana token? Full token due-diligence in one call — replaces 3-4 lookups; built for a trading / sniping agent's risk-review pipeline. Solana trading safety decision and buy/avoid verdict.
+- Input (query): mint*
+- Example: GET /solana/pre-trade?mint=EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm
+- Tags: solana-pre-trade, trading-decision, liquidity-depth, deployer-history, all-in-one
+
+### GET /agent/rank-check  ($0.10)
+Quick check of where an x402 seller ranks RIGHT NOW by keyword-relevance in the CDP Bazaar discovery (not the raw settled-volume rank the free explorers show): best rank + per-category-keyword rank in one cheap call, plus a pointer to the full /agent/visibility-audit when the rank slips. The frequent pulse for monitoring your x402 discoverability. Where do I rank now? Am I being out-ranked on my category keywords?
+- Input (query): seller*
+- Example: GET /agent/rank-check?seller=api.example.com
+- Tags: rank-check, x402-discoverability, bazaar-ranking, keyword-rank, discovery-monitor
+
+### GET /agent/visibility-audit  ($1.00)
+Audit how discoverable an x402 agent/seller is across the agent registries (CDP Bazaar, 402index): keyword-RELEVANCE rank per category (not raw settled-volume rank), a metadata-quality score of your advertised endpoints (schema, output.example, tags, llm_usage_prompt), settle activity, a top-3 benchmark, prioritized fixes, and a DELTA vs a signed snapshot you carry back. Why am I not being found and how do I climb? GEO/AEO discovery audit for x402 sellers, Ed25519-signed.
+- Input (query): seller*, snapshot
+- Example: GET /agent/visibility-audit?seller=api.example.com
+- Tags: visibility-audit, discoverability, bazaar-ranking, aeo-geo, discovery-seo

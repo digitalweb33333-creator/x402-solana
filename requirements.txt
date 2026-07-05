@@ -1,0 +1,46 @@
+# x402-endpoints — dépendances de production (Render)
+# Entrée :  uvicorn app.main:app --host 0.0.0.0 --port $PORT
+# Versions figées sur l'environnement local validé (mainnet + facilitator CDP).
+# Curé d'après les imports réels de app/ — pas un pip freeze brut.
+
+# --- Serveur web ---
+fastapi==0.138.0
+uvicorn==0.49.0
+starlette==1.3.1            # importé directement (starlette.exceptions.HTTPException)
+pydantic==2.13.4           # modèles FastAPI + schémas x402
+
+# --- Serveur MCP (remote /mcp + module mcp_server : outils natifs pour agents) ---
+mcp==1.28.1
+
+# --- SDK x402 (middleware seller + schemes "exact" EVM & SVM + extension discovery Bazaar) ---
+# extras requis (sinon ImportError au runtime) :
+#   [svm]        = scheme "exact" Solana (SVM) — RAIL DE PAIEMENT PRINCIPAL de ce projet
+#   [evm]        = scheme "exact" EVM (endpoints token-safety/dossier gèrent aussi les chaînes EVM)
+#   [extensions] = extension discovery Bazaar (inputSchema / output.example)
+x402[evm,svm,extensions]==2.13.1
+
+# deps fonctionnelles de x402[svm] (client/serveur Solana : transfert SPL, ATA, feePayer)
+solders==0.27.1
+# solana-py 0.36.x : dernière série exposant solana.rpc.api/commitment/types (requis par
+# x402[svm]) ET compatible solders>=0.27 (0.37+ a restructuré rpc.api → cassé l'import).
+solana==0.36.12
+
+# deps fonctionnelles de x402[evm] (figées pour reproductibilité)
+eth-account==0.13.7
+eth-abi==5.2.0
+eth-keys==0.7.0
+eth-utils==6.0.0
+web3==7.16.0
+
+# deps fonctionnelles de x402[extensions]
+jsonschema==4.26.0
+signinwithethereum==5.0.1
+
+# --- Auth facilitator CDP : Bearer JWT Ed25519 (app/cdp_auth.py) ---
+PyNaCl==1.6.2
+
+# --- Client HTTP pour les APIs sources amont ---
+httpx==0.28.1
+
+# --- Chargement de la config (.env) ---
+python-dotenv==1.2.2

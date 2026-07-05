@@ -1,0 +1,402 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "x402-solana",
+  "description": "Paid x402 API tools for AI agents, settled in USDC on Solana. Crypto pre-trade safety (Solana SPL rug/honeypot checks, EVM+Solana token safety, one-call GO/NO-GO pre-trade verdicts, full token dossiers), market data (Polymarket prediction-market odds), official verification (GLEIF LEI KYB, EU sanctions/AML screening), and x402 agent discoverability (Bazaar keyword-rank pulse and signed visibility audits). Real-time, structured, machine-readable verdicts. No API key — payment is authentication. Gasless for the buyer (the facilitator is fee payer).",
+  "url": "https://x402-solana.onrender.com",
+  "preferredTransport": "JSONRPC",
+  "provider": {
+    "organization": "x402-solana",
+    "url": "https://x402-solana.onrender.com"
+  },
+  "version": "0.1.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "payments": {
+    "protocol": "x402",
+    "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+    "asset": {
+      "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "symbol": "USDC",
+      "decimals": 6
+    },
+    "payTo": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+    "facilitator": "https://api.cdp.coinbase.com/platform/v2/x402"
+  },
+  "skills": [
+    {
+      "id": "gleif-lei-lookup",
+      "name": "GLEIF LEI Lookup",
+      "description": "Look up any Legal Entity Identifier (LEI) for company information lookup and counterparty / know-your-business (KYB) identity against the official GLEIF global registry — returns legal name, status, jurisdiction, legal form and registered address, real-time, worldwide coverage.",
+      "tags": [
+        "lei",
+        "gleif",
+        "kyb",
+        "company-data",
+        "compliance"
+      ],
+      "examples": [
+        "Call /gleif/lei with {\"lei\": \"529900T8BM49AURSDO55\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/gleif/lei",
+        "queryParams": {
+          "lei": {
+            "type": "string",
+            "description": "20-character LEI, e.g. '529900T8BM49AURSDO55'",
+            "pattern": "^[A-Z0-9]{20}$",
+            "required": true
+          }
+        }
+      }
+    },
+    {
+      "id": "eu-sanctions-screening",
+      "name": "EU Sanctions Screening",
+      "description": "Screen a name against the official EU consolidated sanctions list (FISMA) for anti-money-laundering (AML) and watchlist checks — returns matches with a similarity score and context (EU reference, type, programme), not a binary yes/no.",
+      "tags": [
+        "sanctions",
+        "aml",
+        "watchlist",
+        "compliance",
+        "eu"
+      ],
+      "examples": [
+        "Call /sanctions/screen with {\"name\": \"Saddam Hussein\", \"type\": \"person\", \"threshold\": 0.7, \"limit\": 5}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/sanctions/screen",
+        "queryParams": {
+          "name": {
+            "type": "string",
+            "description": "Name to screen (person or entity), e.g. 'Saddam Hussein'",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "description": "Optional: 'person' or 'enterprise'",
+            "required": false
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Min similarity 0-1 to report a match (default 0.7)",
+            "required": false
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max matches [1-50], e.g. 10",
+            "required": false
+          }
+        }
+      }
+    },
+    {
+      "id": "polymarket-odds",
+      "name": "Polymarket Odds",
+      "description": "Live prediction market odds, implied probabilities and betting-market data from Polymarket — give a market id or slug, get each outcome with its probability (0-1), volume, liquidity and resolution status.",
+      "tags": [
+        "polymarket",
+        "prediction-market",
+        "betting-odds",
+        "odds",
+        "probability"
+      ],
+      "examples": [
+        "Call /polymarket/odds with {\"market\": \"2654605\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/polymarket/odds",
+        "queryParams": {
+          "market": {
+            "type": "string",
+            "description": "Polymarket market id or slug, e.g. '2654605' or 'will-it-rain-tomorrow'",
+            "required": true
+          }
+        }
+      }
+    },
+    {
+      "id": "token-safety-check",
+      "name": "Token Safety Check",
+      "description": "Token safety check before buying — is this token a honeypot or a rug pull? Bundles honeypot detection, buy/sell tax, holder concentration, LP lock and liquidity (GoPlus, Honeypot.is, DexScreener) into a single 0-100 token security risk score with a clear buy/avoid verdict. One call replaces three lookups. EVM chains.",
+      "tags": [
+        "token-safety",
+        "honeypot",
+        "rug-check",
+        "token-security",
+        "risk-score"
+      ],
+      "examples": [
+        "Call /crypto/token-safety with {\"token\": \"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913\", \"chain\": \"base\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/crypto/token-safety",
+        "queryParams": {
+          "token": {
+            "type": "string",
+            "description": "Token contract address (0x + 40 hex), e.g. '0x833589...2913'",
+            "required": true
+          },
+          "chain": {
+            "type": "string",
+            "description": "base | ethereum | bsc | polygon | arbitrum | optimism | avalanche (default base)",
+            "required": false
+          }
+        }
+      }
+    },
+    {
+      "id": "pre-trade-verdict",
+      "name": "Pre-Trade Verdict",
+      "description": "One-call GO/CAUTION/NO-GO pre-trade verdict for AI trading agents: fuses token safety (honeypot, rug, tax, holders), counterparty wallet sanctions screening (OFAC/mixer) and cross-exchange market signal into a single decision with a signed, offline-verifiable receipt. Should I buy this token now? Replaces three separate calls (token-safety + wallet-screen + signal) with one fused GO/NO-GO verdict. EVM chains and Solana.",
+      "tags": [
+        "pre-trade-verdict",
+        "token-safety",
+        "go-no-go",
+        "counterparty-screen",
+        "trading-decision"
+      ],
+      "examples": [
+        "Call /crypto/pre-trade-verdict with {\"token\": \"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913\", \"chain\": \"base\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/crypto/pre-trade-verdict",
+        "queryParams": {
+          "token": {
+            "type": "string",
+            "description": "Token contract (EVM 0x+40hex) or SPL mint (base58) to evaluate",
+            "required": true
+          },
+          "chain": {
+            "type": "string",
+            "description": "base | ethereum | bsc | polygon | arbitrum | optimism | avalanche | solana (default base)",
+            "required": false
+          },
+          "wallet": {
+            "type": "string",
+            "description": "Optional counterparty wallet to screen (OFAC/mixer)",
+            "required": false
+          }
+        }
+      }
+    },
+    {
+      "id": "token-dossier",
+      "name": "Token Dossier",
+      "description": "Full degen token dossier in one call: safety score + honeypot/tax + detailed TOP HOLDERS and concentration + liquidity/FDV/volume/pool-age + contract control (owner, creator, mintable, open-source) + an AI red-flag narrative. Deep due-diligence report on a token before aping — the premium tier above a plain safety check. EVM chains and Solana.",
+      "tags": [
+        "token-dossier",
+        "holders",
+        "liquidity",
+        "rug-check",
+        "red-flags"
+      ],
+      "examples": [
+        "Call /crypto/token-dossier with {\"token\": \"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913\", \"chain\": \"base\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/crypto/token-dossier",
+        "queryParams": {
+          "token": {
+            "type": "string",
+            "description": "Token contract (EVM 0x+40hex) or SPL mint (base58)",
+            "required": true
+          },
+          "chain": {
+            "type": "string",
+            "description": "base | ethereum | bsc | polygon | arbitrum | optimism | avalanche | solana (default base)",
+            "required": false
+          }
+        }
+      }
+    },
+    {
+      "id": "solana-token-safety-pro",
+      "name": "Solana Token Safety Pro",
+      "description": "Solana SPL token safety, rug check and honeypot / scam detection before trading: is this Solana token a rug pull, honeypot or scam? Verdict SAFE/RISKY/CRITICAL + 0-100 score combining STATIC checks (mint/freeze authority, holder concentration) AND BEHAVIORAL analysis (liquidity, churn, recent dump, tx velocity) plus a blue-chip false-positive guard so USDC/USDT/SOL are never flagged. Pre-trade SPL token security / scam-token detection catching behavioral rugs static checkers miss.",
+      "tags": [
+        "solana-token-safety",
+        "rug-check",
+        "honeypot",
+        "behavioral-analysis",
+        "spl-token-risk"
+      ],
+      "examples": [
+        "Call /solana/token-safety with {\"mint\": \"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v\", \"deep\": false}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/solana/token-safety",
+        "queryParams": {
+          "mint": {
+            "type": "string",
+            "description": "SPL token mint address (base58), e.g. 'EPjFW...Dt1v' (USDC)",
+            "required": true
+          },
+          "deep": {
+            "type": "boolean",
+            "description": "Deeper behavioral + holder analysis (more RPC calls)",
+            "required": false
+          }
+        }
+      }
+    },
+    {
+      "id": "solana-pre-trade-bundle",
+      "name": "Solana Pre-Trade Bundle",
+      "description": "All-in-one Solana pre-trade decision in ONE call: BUY-SAFE/CAUTION/AVOID fusing four scored modules — token security, EXECUTABLE liquidity depth (estimated slippage at $100/$1k/$10k), deployer history/control and holder concentration. Should I buy or avoid this Solana token? Full token due-diligence in one call — replaces 3-4 lookups; built for a trading / sniping agent's risk-review pipeline. Solana trading safety decision and buy/avoid verdict.",
+      "tags": [
+        "solana-pre-trade",
+        "trading-decision",
+        "liquidity-depth",
+        "deployer-history",
+        "all-in-one"
+      ],
+      "examples": [
+        "Call /solana/pre-trade with {\"mint\": \"EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/solana/pre-trade",
+        "queryParams": {
+          "mint": {
+            "type": "string",
+            "description": "SPL token mint address (base58) to evaluate before buying",
+            "required": true
+          }
+        }
+      }
+    },
+    {
+      "id": "agent-rank-check",
+      "name": "Agent Rank Check",
+      "description": "Quick check of where an x402 seller ranks RIGHT NOW by keyword-relevance in the CDP Bazaar discovery (not the raw settled-volume rank the free explorers show): best rank + per-category-keyword rank in one cheap call, plus a pointer to the full /agent/visibility-audit when the rank slips. The frequent pulse for monitoring your x402 discoverability. Where do I rank now? Am I being out-ranked on my category keywords?",
+      "tags": [
+        "rank-check",
+        "x402-discoverability",
+        "bazaar-ranking",
+        "keyword-rank",
+        "discovery-monitor"
+      ],
+      "examples": [
+        "Call /agent/rank-check with {\"seller\": \"api.example.com\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/agent/rank-check",
+        "queryParams": {
+          "seller": {
+            "type": "string",
+            "description": "Seller to check: wallet (0x + 40 hex or Solana base58) or origin URL/domain, e.g. 'api.example.com'",
+            "required": true
+          }
+        }
+      }
+    },
+    {
+      "id": "agent-visibility-audit",
+      "name": "Agent Visibility Audit",
+      "description": "Audit how discoverable an x402 agent/seller is across the agent registries (CDP Bazaar, 402index): keyword-RELEVANCE rank per category (not raw settled-volume rank), a metadata-quality score of your advertised endpoints (schema, output.example, tags, llm_usage_prompt), settle activity, a top-3 benchmark, prioritized fixes, and a DELTA vs a signed snapshot you carry back. Why am I not being found and how do I climb? GEO/AEO discovery audit for x402 sellers, Ed25519-signed.",
+      "tags": [
+        "visibility-audit",
+        "discoverability",
+        "bazaar-ranking",
+        "aeo-geo",
+        "discovery-seo"
+      ],
+      "examples": [
+        "Call /agent/visibility-audit with {\"seller\": \"api.example.com\"}"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "endpoint": {
+        "method": "GET",
+        "path": "/agent/visibility-audit",
+        "queryParams": {
+          "seller": {
+            "type": "string",
+            "description": "Seller to audit: wallet (0x + 40 hex or Solana base58) or origin URL/domain, e.g. 'api.example.com'",
+            "required": true
+          },
+          "snapshot": {
+            "type": "string",
+            "description": "Optional: the signed_snapshot JSON from a previous audit, to compute a dated delta",
+            "required": false
+          }
+        }
+      }
+    }
+  ]
+}

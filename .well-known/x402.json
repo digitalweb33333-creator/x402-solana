@@ -1,0 +1,945 @@
+{
+  "x402Version": 2,
+  "name": "x402-solana",
+  "description": "Paid x402 API tools for AI agents, settled in USDC on Solana. Crypto pre-trade safety (Solana SPL rug/honeypot checks, EVM+Solana token safety, one-call GO/NO-GO pre-trade verdicts, full token dossiers), market data (Polymarket prediction-market odds), official verification (GLEIF LEI KYB, EU sanctions/AML screening), and x402 agent discoverability (Bazaar keyword-rank pulse and signed visibility audits). Real-time, structured, machine-readable verdicts. No API key — payment is authentication. Gasless for the buyer (the facilitator is fee payer).",
+  "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+  "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+  "asset": {
+    "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "symbol": "USDC",
+    "decimals": 6
+  },
+  "facilitator": "https://api.cdp.coinbase.com/platform/v2/x402",
+  "resources": [
+    {
+      "resource": "/gleif/lei",
+      "method": "GET",
+      "description": "Look up any Legal Entity Identifier (LEI) for company information lookup and counterparty / know-your-business (KYB) identity against the official GLEIF global registry — returns legal name, status, jurisdiction, legal form and registered address, real-time, worldwide coverage.",
+      "mimeType": "application/json",
+      "price": "$0.01",
+      "amount": "10000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "lei",
+        "gleif",
+        "kyb",
+        "company-data",
+        "compliance"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "lei": {
+            "type": "string",
+            "description": "20-character LEI, e.g. '529900T8BM49AURSDO55'",
+            "pattern": "^[A-Z0-9]{20}$",
+            "required": true
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "lei": "529900T8BM49AURSDO55",
+          "legal_name": "Ubisecure Oy",
+          "entity_status": "ACTIVE",
+          "registration_status": "ISSUED",
+          "jurisdiction": "FI",
+          "legal_form_code": "DKUW",
+          "legal_address": {
+            "lines": [
+              "Tekniikantie 14"
+            ],
+            "city": "ESPOO",
+            "region": "FI-18",
+            "country": "FI",
+            "postal_code": "02150"
+          },
+          "initial_registration_date": "2016-08-04T11:00:36Z",
+          "last_update_date": "2024-06-20T07:11:02Z",
+          "next_renewal_date": "2027-06-28T18:34:06Z",
+          "managing_lou": "529900T8BM49AURSDO55",
+          "source": "GLEIF API v1 (gleif.org)",
+          "timestamp": "2026-06-24T12:00:00Z",
+          "disclaimer": "Indicative data from the GLEIF register, not a compliance opinion.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/sanctions/screen",
+      "method": "GET",
+      "description": "Screen a name against the official EU consolidated sanctions list (FISMA) for anti-money-laundering (AML) and watchlist checks — returns matches with a similarity score and context (EU reference, type, programme), not a binary yes/no.",
+      "mimeType": "application/json",
+      "price": "$0.05",
+      "amount": "50000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "sanctions",
+        "aml",
+        "watchlist",
+        "compliance",
+        "eu"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "name": {
+            "type": "string",
+            "description": "Name to screen (person or entity), e.g. 'Saddam Hussein'",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "description": "Optional: 'person' or 'enterprise'",
+            "required": false
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Min similarity 0-1 to report a match (default 0.7)",
+            "required": false
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max matches [1-50], e.g. 10",
+            "required": false
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "query": "Saddam Hussein",
+          "type": "person",
+          "threshold": 0.7,
+          "match_count": 1,
+          "matches": [
+            {
+              "name": "Saddam Hussein Al-Tikriti",
+              "score": 0.78,
+              "subject_type": "person",
+              "eu_reference": "EU.27.28",
+              "un_id": null,
+              "programme": "IRQ",
+              "designation_details": "Former President of Iraq",
+              "publication_date": "2003-07-07"
+            }
+          ],
+          "list_size": 38542,
+          "source": "EU Consolidated Financial Sanctions List — FISMA (webgate.ec.europa.eu)",
+          "timestamp": "2026-06-24T15:15:00Z",
+          "disclaimer": "Indicative screening against the EU consolidated list; a match is not a legal confirmation and requires human review. Not a compliance opinion.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/polymarket/odds",
+      "method": "GET",
+      "description": "Live prediction market odds, implied probabilities and betting-market data from Polymarket — give a market id or slug, get each outcome with its probability (0-1), volume, liquidity and resolution status.",
+      "mimeType": "application/json",
+      "price": "$0.05",
+      "amount": "50000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "polymarket",
+        "prediction-market",
+        "betting-odds",
+        "odds",
+        "probability"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "market": {
+            "type": "string",
+            "description": "Polymarket market id or slug, e.g. '2654605' or 'will-it-rain-tomorrow'",
+            "required": true
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "id": "2654605",
+          "slug": "wta-andreeva-vs-day-set-2",
+          "question": "Set 2 Winner: Andreeva vs Day",
+          "outcomes": [
+            {
+              "name": "Andreeva",
+              "price": 0.06,
+              "probability": 0.06
+            },
+            {
+              "name": "Day",
+              "price": 0.94,
+              "probability": 0.94
+            }
+          ],
+          "active": true,
+          "closed": false,
+          "volume": "99.98",
+          "liquidity": "1426.8",
+          "end_date": "2026-07-01T11:30:00Z",
+          "resolution_source": null,
+          "source": "Polymarket Gamma API (gamma-api.polymarket.com)",
+          "timestamp": "2026-06-24T14:20:00Z",
+          "disclaimer": "Indicative market odds, not investment advice.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/crypto/token-safety",
+      "method": "GET",
+      "description": "Token safety check before buying — is this token a honeypot or a rug pull? Bundles honeypot detection, buy/sell tax, holder concentration, LP lock and liquidity (GoPlus, Honeypot.is, DexScreener) into a single 0-100 token security risk score with a clear buy/avoid verdict. One call replaces three lookups. EVM chains.",
+      "mimeType": "application/json",
+      "price": "$0.05",
+      "amount": "50000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "token-safety",
+        "honeypot",
+        "rug-check",
+        "token-security",
+        "risk-score"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "token": {
+            "type": "string",
+            "description": "Token contract address (0x + 40 hex), e.g. '0x833589...2913'",
+            "required": true
+          },
+          "chain": {
+            "type": "string",
+            "description": "base | ethereum | bsc | polygon | arbitrum | optimism | avalanche (default base)",
+            "required": false
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "query": {
+            "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "chain": "base"
+          },
+          "safety_score": 95,
+          "rating": "safe",
+          "verdict": "Low risk on automated checks. Always DYOR.",
+          "honeypot": false,
+          "buy_tax_pct": 0.0,
+          "sell_tax_pct": 0.0,
+          "flags": [],
+          "market": {
+            "price_usd": 1.0,
+            "liquidity_usd": 5200000.0,
+            "volume_24h_usd": 18000000.0,
+            "dex": "aerodrome",
+            "symbol": "USDC"
+          },
+          "holder_count": "250000",
+          "sources_ok": {
+            "goplus": true,
+            "honeypot_is": true,
+            "dexscreener": true
+          },
+          "source": "GoPlus Security + Honeypot.is + DexScreener",
+          "timestamp": "2026-06-26T16:00:00Z",
+          "disclaimer": "Automated heuristic safety check, not financial advice. Always do your own research.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/crypto/pre-trade-verdict",
+      "method": "GET",
+      "description": "One-call GO/CAUTION/NO-GO pre-trade verdict for AI trading agents: fuses token safety (honeypot, rug, tax, holders), counterparty wallet sanctions screening (OFAC/mixer) and cross-exchange market signal into a single decision with a signed, offline-verifiable receipt. Should I buy this token now? Replaces three separate calls (token-safety + wallet-screen + signal) with one fused GO/NO-GO verdict. EVM chains and Solana.",
+      "mimeType": "application/json",
+      "price": "$0.05",
+      "amount": "50000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "pre-trade-verdict",
+        "token-safety",
+        "go-no-go",
+        "counterparty-screen",
+        "trading-decision"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "token": {
+            "type": "string",
+            "description": "Token contract (EVM 0x+40hex) or SPL mint (base58) to evaluate",
+            "required": true
+          },
+          "chain": {
+            "type": "string",
+            "description": "base | ethereum | bsc | polygon | arbitrum | optimism | avalanche | solana (default base)",
+            "required": false
+          },
+          "wallet": {
+            "type": "string",
+            "description": "Optional counterparty wallet to screen (OFAC/mixer)",
+            "required": false
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "verdict": "GO",
+          "confidence": 0.88,
+          "reasons": [
+            {
+              "code": "SAFETY_OK",
+              "label": "Token safety score 95/100 (low risk on automated checks).",
+              "weight": -0.5
+            },
+            {
+              "code": "SIGNAL_NEUTRAL",
+              "label": "Cross-exchange signal is NEUTRAL.",
+              "weight": 0.0
+            }
+          ],
+          "query": {
+            "chain": "base",
+            "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "wallet": null
+          },
+          "components": {
+            "token_safety": {
+              "available": true,
+              "kind": "evm",
+              "safety_score": 95,
+              "honeypot": false,
+              "rating": "safe",
+              "flags": [],
+              "symbol": "USDC",
+              "buy_tax_pct": 0.0,
+              "sell_tax_pct": 0.0
+            },
+            "counterparty_screen": {
+              "available": false,
+              "reason": "no wallet supplied"
+            },
+            "market_signal": {
+              "available": true,
+              "symbol": "USDC",
+              "signal": "NEUTRAL",
+              "confidence": 0.5,
+              "fused_score": 0.0
+            }
+          },
+          "signed_receipt": {
+            "available": true,
+            "algorithm": "ed25519",
+            "public_key": "5b77...9f9d",
+            "claims": {
+              "kind": "pre_trade_verdict",
+              "chain": "base",
+              "token": "0x8335...2913",
+              "verdict": "GO",
+              "safety_score": 95
+            }
+          },
+          "data_freshness": {
+            "as_of": "2026-07-02T12:00:00Z",
+            "age_seconds": 0,
+            "retrieved_at": "2026-07-02T12:00:00Z",
+            "deterministic": false,
+            "sources": [
+              "Internal token-safety",
+              "Internal wallet-screen",
+              "Internal signal-fusion"
+            ],
+            "components_available": [
+              "token_safety",
+              "market_signal"
+            ]
+          },
+          "error": null,
+          "timestamp": "2026-07-02T12:00:00Z",
+          "disclaimer": "Fused pre-trade verdict from automated safety/screening/signal checks. Heuristic, not financial advice. Always DYOR.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/crypto/token-dossier",
+      "method": "GET",
+      "description": "Full degen token dossier in one call: safety score + honeypot/tax + detailed TOP HOLDERS and concentration + liquidity/FDV/volume/pool-age + contract control (owner, creator, mintable, open-source) + an AI red-flag narrative. Deep due-diligence report on a token before aping — the premium tier above a plain safety check. EVM chains and Solana.",
+      "mimeType": "application/json",
+      "price": "$0.10",
+      "amount": "100000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "token-dossier",
+        "holders",
+        "liquidity",
+        "rug-check",
+        "red-flags"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "token": {
+            "type": "string",
+            "description": "Token contract (EVM 0x+40hex) or SPL mint (base58)",
+            "required": true
+          },
+          "chain": {
+            "type": "string",
+            "description": "base | ethereum | bsc | polygon | arbitrum | optimism | avalanche | solana (default base)",
+            "required": false
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "query": {
+            "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "chain": "base"
+          },
+          "safety": {
+            "score": 95,
+            "rating": "safe",
+            "honeypot": false,
+            "buy_tax_pct": 0.0,
+            "sell_tax_pct": 0.0,
+            "flags": []
+          },
+          "holders": {
+            "count": "250000",
+            "top": [
+              {
+                "address": "0xabc...",
+                "percent": 0.08,
+                "is_contract": true,
+                "tag": "Aerodrome"
+              }
+            ],
+            "top10_share_pct": 42.1
+          },
+          "liquidity": {
+            "liquidity_usd": 5200000.0,
+            "fdv_usd": 40000000000.0,
+            "volume_24h_usd": 18000000.0,
+            "price_usd": 1.0,
+            "price_change_24h_pct": 0.01,
+            "pool_age_hours": 9000.0,
+            "dex": "aerodrome",
+            "symbol": "USDC"
+          },
+          "contract": {
+            "open_source": true,
+            "mintable": true,
+            "owner_address": null,
+            "creator_address": null,
+            "is_proxy": true,
+            "can_take_back_ownership": false
+          },
+          "narrative": {
+            "summary": "USDC is a fully-collateralized blue-chip stablecoin with deep liquidity; automated checks show no rug/honeypot signals.",
+            "red_flags": [],
+            "bottom_line": "Low automated risk; standard stablecoin.",
+            "mode": "llm"
+          },
+          "data_freshness": {
+            "as_of": "2026-07-02T12:00:00Z",
+            "age_seconds": 0,
+            "retrieved_at": "2026-07-02T12:00:00Z",
+            "deterministic": false,
+            "sources": [
+              "GoPlus Security",
+              "Honeypot.is",
+              "DexScreener",
+              "Claude Haiku (narrative)"
+            ],
+            "narrative_mode": "llm",
+            "chain_kind": "evm"
+          },
+          "error": null,
+          "source": "GoPlus Security + Honeypot.is + DexScreener + Claude Haiku (narrative)",
+          "timestamp": "2026-07-02T12:00:00Z",
+          "disclaimer": "Automated token dossier (safety + holders + liquidity + narrative). Heuristic, not financial advice. Always DYOR.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/solana/token-safety",
+      "method": "GET",
+      "description": "Solana SPL token safety, rug check and honeypot / scam detection before trading: is this Solana token a rug pull, honeypot or scam? Verdict SAFE/RISKY/CRITICAL + 0-100 score combining STATIC checks (mint/freeze authority, holder concentration) AND BEHAVIORAL analysis (liquidity, churn, recent dump, tx velocity) plus a blue-chip false-positive guard so USDC/USDT/SOL are never flagged. Pre-trade SPL token security / scam-token detection catching behavioral rugs static checkers miss.",
+      "mimeType": "application/json",
+      "price": "$0.01",
+      "amount": "10000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "solana-token-safety",
+        "rug-check",
+        "honeypot",
+        "behavioral-analysis",
+        "spl-token-risk"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "mint": {
+            "type": "string",
+            "description": "SPL token mint address (base58), e.g. 'EPjFW...Dt1v' (USDC)",
+            "required": true
+          },
+          "deep": {
+            "type": "boolean",
+            "description": "Deeper behavioral + holder analysis (more RPC calls)",
+            "required": false
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "verdict": "RISKY",
+          "confidence": 0.8,
+          "score": 62,
+          "reasons": [
+            {
+              "code": "COMPOSITE_SCORE",
+              "label": "Composite safety score 62/100",
+              "weight": 0.2
+            }
+          ],
+          "query": {
+            "mint": "So11111111111111111111111111111111111111112",
+            "deep": false
+          },
+          "static_flags": [
+            {
+              "code": "MINT_AUTHORITY_ACTIVE",
+              "label": "Mint authority not renounced — supply can be inflated",
+              "weight": 0.6
+            }
+          ],
+          "behavioral_flags": [
+            {
+              "code": "LIQUIDITY_TO_FDV_THIN",
+              "label": "Liquidity is 1.4% of FDV — top-heavy valuation",
+              "weight": 0.5
+            }
+          ],
+          "behavioral_status": "ok",
+          "false_positive_guard": {
+            "triggered": false,
+            "note": "Not whitelisted; behavioral context applied to avoid static-only over-flagging."
+          },
+          "concentration": {
+            "top1_share": 0.41,
+            "top5_share": 0.66,
+            "note": "Largest account may be an AMM/LP pool, not a malicious whale."
+          },
+          "market": {
+            "liquidity_usd": 240000.0,
+            "fdv_usd": 17000000.0,
+            "volume_24h_usd": 980000.0,
+            "price_change_24h_pct": -8.2,
+            "pool_age_hours": 220.5,
+            "symbol": "WIF",
+            "dex": "raydium"
+          },
+          "mint_info": {
+            "mint_authority": null,
+            "freeze_authority": null,
+            "decimals": 6,
+            "is_token_2022": false
+          },
+          "sources_ok": {
+            "solana_rpc": true,
+            "dexscreener": true
+          },
+          "data_freshness": {
+            "as_of": "2026-06-29T12:00:00Z",
+            "age_seconds": 0,
+            "retrieved_at": "2026-06-29T12:00:00Z",
+            "deterministic": false,
+            "sources": [
+              "Solana RPC (mint, largest accounts, signatures)",
+              "DexScreener (liquidity, pool age, price)"
+            ],
+            "behavioral_status": "ok"
+          },
+          "error": null,
+          "timestamp": "2026-06-29T12:00:00Z",
+          "disclaimer": "Automated heuristic safety check (static + behavioral), not financial advice. Always DYOR.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/solana/pre-trade",
+      "method": "GET",
+      "description": "All-in-one Solana pre-trade decision in ONE call: BUY-SAFE/CAUTION/AVOID fusing four scored modules — token security, EXECUTABLE liquidity depth (estimated slippage at $100/$1k/$10k), deployer history/control and holder concentration. Should I buy or avoid this Solana token? Full token due-diligence in one call — replaces 3-4 lookups; built for a trading / sniping agent's risk-review pipeline. Solana trading safety decision and buy/avoid verdict.",
+      "mimeType": "application/json",
+      "price": "$0.05",
+      "amount": "50000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "solana-pre-trade",
+        "trading-decision",
+        "liquidity-depth",
+        "deployer-history",
+        "all-in-one"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "mint": {
+            "type": "string",
+            "description": "SPL token mint address (base58) to evaluate before buying",
+            "required": true
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "verdict": "CAUTION",
+          "confidence": 0.75,
+          "composite_score": 64,
+          "reasons": [
+            {
+              "code": "MODERATE_DEPTH",
+              "label": "~3.1% impact on a $1k trade",
+              "weight": 0.2
+            },
+            {
+              "code": "AUTHORITIES_RENOUNCED",
+              "label": "Mint & freeze authority renounced — deployer retains no control",
+              "weight": -0.4
+            }
+          ],
+          "query": {
+            "mint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm"
+          },
+          "module_weights": {
+            "token_security": 0.4,
+            "liquidity_depth": 0.25,
+            "deployer_history": 0.2,
+            "holder_concentration": 0.15
+          },
+          "modules": {
+            "token_security": {
+              "sub_score": 70,
+              "status": "ok",
+              "static_flags": [],
+              "behavioral_flags": [],
+              "behavioral_status": "ok"
+            },
+            "liquidity_depth": {
+              "status": "ok",
+              "sub_score": 70,
+              "liquidity_usd": 320000.0,
+              "slippage_estimates": [
+                {
+                  "trade_usd": 100,
+                  "est_price_impact_pct": 0.06
+                },
+                {
+                  "trade_usd": 1000,
+                  "est_price_impact_pct": 0.62
+                },
+                {
+                  "trade_usd": 10000,
+                  "est_price_impact_pct": 5.88
+                }
+              ],
+              "reasons": [
+                {
+                  "code": "MODERATE_DEPTH",
+                  "label": "~0.6% impact on a $1k trade",
+                  "weight": 0.2
+                }
+              ],
+              "note": "Estimated from pooled liquidity via a constant-product model; real slippage depends on routing."
+            },
+            "deployer_history": {
+              "status": "renounced",
+              "sub_score": 80,
+              "controller": null,
+              "reasons": [
+                {
+                  "code": "AUTHORITIES_RENOUNCED",
+                  "label": "Mint & freeze authority renounced",
+                  "weight": -0.4
+                }
+              ],
+              "note": "Deployer no longer controls the mint."
+            },
+            "holder_concentration": {
+              "status": "ok",
+              "sub_score": 60,
+              "top1_share": 0.34,
+              "top5_share": 0.58,
+              "reasons": [
+                {
+                  "code": "MODERATE_CONCENTRATION",
+                  "label": "Top account 34%",
+                  "weight": 0.2
+                }
+              ],
+              "note": "Largest account may be an AMM/LP pool, not a malicious whale."
+            }
+          },
+          "market": {
+            "liquidity_usd": 320000.0,
+            "fdv_usd": 9000000.0,
+            "volume_24h_usd": 1200000.0,
+            "price_change_24h_pct": 4.1,
+            "pool_age_hours": 5200.0,
+            "symbol": "WIF",
+            "dex": "raydium"
+          },
+          "data_freshness": {
+            "as_of": "2026-06-29T12:00:00Z",
+            "age_seconds": 0,
+            "retrieved_at": "2026-06-29T12:00:00Z",
+            "deterministic": false,
+            "sources": [
+              "Solana RPC",
+              "DexScreener"
+            ],
+            "kill_switch": false,
+            "behavioral_status": "ok"
+          },
+          "error": null,
+          "timestamp": "2026-06-29T12:00:00Z",
+          "disclaimer": "All-in-one pre-trade decision (security + executable depth + deployer + concentration). Heuristic, not advice. Always DYOR.",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/agent/rank-check",
+      "method": "GET",
+      "description": "Quick check of where an x402 seller ranks RIGHT NOW by keyword-relevance in the CDP Bazaar discovery (not the raw settled-volume rank the free explorers show): best rank + per-category-keyword rank in one cheap call, plus a pointer to the full /agent/visibility-audit when the rank slips. The frequent pulse for monitoring your x402 discoverability. Where do I rank now? Am I being out-ranked on my category keywords?",
+      "mimeType": "application/json",
+      "price": "$0.10",
+      "amount": "100000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "rank-check",
+        "x402-discoverability",
+        "bazaar-ranking",
+        "keyword-rank",
+        "discovery-monitor"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "seller": {
+            "type": "string",
+            "description": "Seller to check: wallet (0x + 40 hex or Solana base58) or origin URL/domain, e.g. 'api.example.com'",
+            "required": true
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "seller": "api.example.com",
+          "best_rank": 14,
+          "headline": "Best rank #14 (outside the top 10) — you're being out-ranked.",
+          "per_keyword": [
+            {
+              "keyword": "kyb",
+              "rank": 14,
+              "scanned": 20
+            },
+            {
+              "keyword": "compliance",
+              "rank": null,
+              "scanned": 20
+            }
+          ],
+          "category_keywords": [
+            "kyb",
+            "compliance",
+            "vat"
+          ],
+          "recommendation": "Rank is slipping on ['compliance'] → run /agent/visibility-audit for the metadata score, prioritized fixes and a signed delta over time.",
+          "upsell": "/agent/visibility-audit",
+          "note": "Keyword-RELEVANCE rank in CDP Bazaar discovery/search — not the raw settled-volume rank the free explorers show.",
+          "error": null,
+          "timestamp": "2026-07-02T12:00:00Z",
+          "cached": false
+        }
+      }
+    },
+    {
+      "resource": "/agent/visibility-audit",
+      "method": "GET",
+      "description": "Audit how discoverable an x402 agent/seller is across the agent registries (CDP Bazaar, 402index): keyword-RELEVANCE rank per category (not raw settled-volume rank), a metadata-quality score of your advertised endpoints (schema, output.example, tags, llm_usage_prompt), settle activity, a top-3 benchmark, prioritized fixes, and a DELTA vs a signed snapshot you carry back. Why am I not being found and how do I climb? GEO/AEO discovery audit for x402 sellers, Ed25519-signed.",
+      "mimeType": "application/json",
+      "price": "$1.00",
+      "amount": "1000000",
+      "scheme": "exact",
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "pay_to": "CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF",
+      "maxTimeoutSeconds": 300,
+      "tags": [
+        "visibility-audit",
+        "discoverability",
+        "bazaar-ranking",
+        "aeo-geo",
+        "discovery-seo"
+      ],
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "seller": {
+            "type": "string",
+            "description": "Seller to audit: wallet (0x + 40 hex or Solana base58) or origin URL/domain, e.g. 'api.example.com'",
+            "required": true
+          },
+          "snapshot": {
+            "type": "string",
+            "description": "Optional: the signed_snapshot JSON from a previous audit, to compute a dated delta",
+            "required": false
+          }
+        }
+      },
+      "output": {
+        "type": "json",
+        "example": {
+          "overall_score": 62,
+          "scores": {
+            "metadata": 78,
+            "keyword_rank": 45,
+            "settle_activity": 55
+          },
+          "summary": "Solid metadata but mid-pack keyword rank (#14 for 'kyb', absent for 'compliance'). Top fix: add a real output.example to endpoints missing one.",
+          "identity": {
+            "declared_name": "Example x402 API",
+            "discovery_available": true,
+            "endpoints_scored": 6
+          },
+          "keyword_rank": {
+            "category_keywords": [
+              "kyb",
+              "compliance",
+              "vat"
+            ],
+            "best_rank": 14,
+            "note": "Keyword-relevance rank in CDP Bazaar discovery (not settled-volume rank).",
+            "bazaar_available": true
+          },
+          "benchmark": {
+            "available": true,
+            "category": "kyb",
+            "top3": [
+              "https://a.com/x",
+              "https://b.com/y",
+              "https://c.com/z"
+            ]
+          },
+          "settle_activity": {
+            "available": true,
+            "verdict": "CAUTION",
+            "trust_score": 62,
+            "settlement_count": 11
+          },
+          "prioritized_fixes": [
+            {
+              "issue": "output_example",
+              "endpoints_affected": 3,
+              "impact": 90,
+              "fix": "Add a real output.example to each endpoint."
+            }
+          ],
+          "delta": {
+            "available": true,
+            "since": "2026-06-28T12:00:00Z",
+            "overall_delta": 9,
+            "per_keyword": [
+              {
+                "keyword": "kyb",
+                "previous_rank": 28,
+                "current_rank": 14,
+                "places_gained": 14
+              }
+            ]
+          },
+          "signed_snapshot": {
+            "available": true,
+            "algorithm": "ed25519",
+            "claims": {
+              "kind": "agent_visibility_snapshot",
+              "seller": "api.example.com",
+              "overall_score": 62,
+              "best_keyword_ranks": {
+                "kyb": 14
+              },
+              "as_of": "2026-07-02T12:00:00Z"
+            },
+            "signature": "<hex>"
+          },
+          "snapshot_usage": "Pass signed_snapshot back as ?snapshot= next time for a dated delta.",
+          "timestamp": "2026-07-02T12:00:00Z",
+          "disclaimer": "Discoverability audit; scores/deltas deterministic and signed, summary is explanation only. Not a guarantee of placement.",
+          "cached": false
+        }
+      }
+    }
+  ]
+}

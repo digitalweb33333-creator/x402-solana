@@ -1,0 +1,18 @@
+# --- Secrets : JAMAIS commités ---
+.env
+*.env
+buyer/.env
+test/.env
+buyer/*.env
+
+# --- Python ---
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# --- Logs / temp ---
+*.log
+/tmp/

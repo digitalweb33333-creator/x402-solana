@@ -1,0 +1,39 @@
+# Render Blueprint — déploiement 1-clic de x402-solana (seller x402 rail Solana).
+# Les valeurs publiques sont inline ; les SECRETS (sync:false) se saisissent dans
+# le dashboard Render (jamais dans le repo). Aucune clé Base n'est écrite ici.
+services:
+  - type: web
+    name: x402-solana
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # --- Publics (rail de paiement Solana) ---
+      - key: PUBLIC_BASE_URL
+        value: https://x402-solana.onrender.com
+      - key: SOLANA_SELLER_ADDRESS
+        value: CucGfdmABDC3QvaZdn9AwUfYBCmmvYjTDdq3WBHXDLEF
+      - key: SOLANA_USDC_MINT
+        value: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+      - key: SOLANA_RPC_URL
+        value: https://api.mainnet-beta.solana.com
+      - key: X402_NETWORK
+        value: solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp
+      - key: FACILITATOR_URL
+        value: https://api.cdp.coinbase.com/platform/v2/x402
+      # --- Secrets (à saisir dans le dashboard Render, requis) ---
+      - key: CDP_API_KEY_ID
+        sync: false
+      - key: CDP_API_KEY_SECRET
+        sync: false
+      - key: RECEIPT_SIGNING_SEED
+        sync: false
+      # --- Secret optionnel (narratif/summary ; dégrade proprement si absent) ---
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-haiku-4-5
