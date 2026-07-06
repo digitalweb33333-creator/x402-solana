@@ -15,10 +15,11 @@ feePayer (gasless côté buyer). La borne DURE des 500 caractères de descriptio
 """
 
 import contextlib
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from starlette.exceptions import HTTPException
 from starlette.routing import Mount
 
@@ -550,6 +551,20 @@ async def wellknown_agent_card() -> FileResponse:
 @app.get("/llms.txt", include_in_schema=False)
 async def llms_txt() -> FileResponse:
     return _serve_file("llms.txt", "text/plain; charset=utf-8")
+
+
+# Preuve de propriété du domaine pour 402index. Sert UNIQUEMENT le hash SHA-256
+# public (jamais le verification_token secret, gardé dans .env non commité).
+# text/plain, sans redirect, < 1KB. Override possible via l'env INDEX402_VERIFICATION_HASH.
+_INDEX402_VERIFICATION_HASH = os.environ.get(
+    "INDEX402_VERIFICATION_HASH",
+    "4f81dba181722ba1e5533fbba87e9ca8772043ec56e0ddf81edd542c96cbb501",
+)
+
+
+@app.get("/.well-known/402index-verify.txt", include_in_schema=False)
+async def wellknown_402index_verify() -> PlainTextResponse:
+    return PlainTextResponse(_INDEX402_VERIFICATION_HASH, media_type="text/plain; charset=utf-8")
 
 
 # --- Endpoint MCP distant (route ASGI brute, hors paywall x402) ---
