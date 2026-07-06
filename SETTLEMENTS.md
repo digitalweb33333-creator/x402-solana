@@ -57,3 +57,18 @@ gasless. → Résultat : les 10 endpoints Solana sont **découvrables via la rec
 | 10 | /agent/visibility-audit | `3hoEVw2CMa6TmsSptoJF4qykYBE3jNASiLktDUJe7wozepE77XBtxtfRBKyNs6BBLcHtZYrnTYkZD19CTdydEZKs` |
 
 **Cumul : 20/20 settlements réels on-chain.**
+
+## Série 3 — 2026-07-06 (bump de fraîcheur ciblé, contre l'URL LIVE)
+
+Refresh du signal `settle_activity`/trust Bazaar sur les 2 endpoints les moins bien classés
+(`sanctions screening` et `solana rug honeypot` étaient #2). Payés sur l'URL live. 2/2 réussis,
+HTTP 200, gasless. Solde buyer au préflight : **1.34602 USDC**.
+
+| # | Endpoint | USDC | Tx signature |
+|---|---|---|---|
+| 1 | /sanctions/screen | 0.05 | `5JhK5v99hKuzhuJMs3xe5k1q1ZAfViWdzNwyMoBoNkCVfMmpNL6WwzfVGczEikGEijNcxAvfxFHLk33yFQZpSZJU` |
+| 2 | /solana/token-safety | 0.01 | `24o6yGkV6EvAZS3UqaH612xwGmJqXZ1WHdyC1BzzVqK861BgWu6CvU9TpZqqr118H8U59USbTNXnWCxmTUMGhbHw` |
+
+**Total Série 3 : 0.06 USDC · 2/2.** Rank re-mesuré juste après : inchangé (#1 `solana token safety`,
+#2 `sanctions`/`rug honeypot`) — le #1 de ces 2 termes génériques est tenu au volume, la propagation
+du signal de fraîcheur prend du temps. **Cumul global : 22/22 settlements réels on-chain.**
